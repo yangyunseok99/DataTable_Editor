@@ -50,7 +50,7 @@
         body { background-color: #F1F5F9; color: #1E293B; overflow: hidden; font-family: 'Noto Sans KR', sans-serif; }
         
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar { width: 6px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 99px; }
         ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
@@ -72,6 +72,22 @@
             border-color: #C4B5FD; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
         }
         
+        /* 반응형 자동 크기 조절 입력창 (Grid Trick) */
+        .auto-expand-wrapper, .auto-expand-wrapper-schema { display: grid; align-items: center; }
+        .auto-expand-wrapper::after, .auto-expand-wrapper-schema::after {
+            content: attr(data-value) ' ';
+            visibility: hidden;
+            white-space: pre;
+            grid-area: 1 / 1;
+            border: 1px solid transparent;
+            font-size: 0.875rem; /* text-sm */
+            line-height: 1.25rem;
+        }
+        .auto-expand-wrapper::after { padding: 0.5rem 0.75rem; font-weight: 500; } /* Tailwind px-3 py-2 매칭 */
+        .auto-expand-wrapper-schema::after { padding: 8px 12px; font-weight: 500; } /* input-cell 매칭 */
+        .auto-expand-wrapper-schema.font-normal-after::after { font-weight: 400; }
+        .auto-expand-wrapper-schema.italic-after::after { font-style: italic; }
+
         /* Checkbox styling */
         .checkbox-custom { width: 18px; height: 18px; accent-color: #8B5CF6; cursor: pointer; }
 
@@ -177,7 +193,7 @@
                     <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="network" class="w-5 h-5 text-brand-purple"></i> 2. 관계도 (ERD)</h3>
                     <ul class="list-disc pl-5 space-y-2 text-sm leading-relaxed">
                         <li>테이블 간의 연결 관계를 한눈에 파악할 수 있는 시각화 탭입니다.</li>
-                        <li>속성 이름과 <b>FK 체크</b> 여부를 기반으로 선이 자동 연결됩니다.</li>
+                        <li>속성 이름(예: <code class="bg-white px-1.5 py-0.5 rounded border text-brand-purple font-mono">item_id</code>)과 <b>FK 체크</b> 여부를 기반으로 선이 자동 연결됩니다.</li>
                         <li>우측 상단의 <b>[자동 정렬]</b> 아이콘을 누르면 겹치지 않게 스마트하게 재배치됩니다.</li>
                         <li><b>[SVG 복사]</b> 버튼을 누르면 깔끔한 벡터 이미지가 복사되어 <b>Figma</b>에 바로 붙여넣을 수 있습니다.</li>
                     </ul>
@@ -187,7 +203,8 @@
                     <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="table" class="w-5 h-5 text-brand-blue"></i> 3. 데이터 관리</h3>
                     <ul class="list-disc pl-5 space-y-2 text-sm leading-relaxed">
                         <li>좌측 메뉴 하단에서 <b>개별 테이블 이름</b>을 클릭하면 실제 데이터를 넣을 수 있습니다.</li>
-                        <li>직접 빈 칸을 클릭해 엑셀처럼 텍스트를 수정하거나 <b>[데이터 추가]</b>로 행을 늘릴 수 있습니다.</li>
+                        <li><b>[데이터 추가]</b> 혹은 <b>[데이터 채우기]</b> 버튼으로 행을 생성하고, 입력칸에 데이터를 타이핑합니다.</li>
+                        <li><b>반응형 레이아웃</b>이 적용되어, 입력하는 내용의 길이에 맞게 칸이 부드럽게 늘어납니다!</li>
                     </ul>
                 </section>
 
@@ -198,6 +215,11 @@
                         <li><b>CSV 합치기 / 열기</b>: 모든 테이블의 데이터를 하나의 엑셀(CSV) 형식 파일로 묶어서 저장합니다.</li>
                     </ul>
                 </section>
+
+                <div class="bg-blue-100/50 p-5 rounded-2xl border border-blue-200 mt-6">
+                    <p class="text-sm font-bold text-brand-blue mb-1">💡 꿀팁: 자동 저장 주의사항</p>
+                    <p class="text-xs text-brand-blue/80 leading-relaxed">이 도구의 데이터는 브라우저를 완전히 닫거나 새로고침하면 지워질 수 있습니다. 작업이 끝나면 꼭 좌측 하단의 <b>[JSON 저장]</b>을 눌러 내 컴퓨터에 안전하게 백업해주세요!</p>
+                </div>
             </div>
         </div>
     </div>
@@ -401,7 +423,7 @@
                 if (schemaCont) savedSchemaScroll = schemaCont.scrollTop;
                 
                 const dataCont = document.getElementById('data-scroll-container');
-                if (dataCont) savedDataScroll = dataCont.scrollTop;
+                if (dataCont) savedDataScroll = dataCont.scrollLeft; // 수평 스크롤 보존을 위해
 
                 workspace.innerHTML = ''; 
 
@@ -422,7 +444,7 @@
                     }
                     if (savedDataScroll > 0) {
                         const el = document.getElementById('data-scroll-container');
-                        if (el) el.scrollTop = savedDataScroll;
+                        if (el) el.scrollLeft = savedDataScroll;
                     }
                 }, 0);
 
@@ -481,8 +503,8 @@
                                 </div>
                                 <button onclick="app.deleteTable('${table.id}')" class="text-slate-300 hover:text-red-500 hover:bg-red-50 p-3 rounded-2xl transition-all"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
                             </div>
-                            <div class="p-6">
-                                <table class="w-full text-left">
+                            <div class="p-6 overflow-x-auto">
+                                <table class="w-full text-left min-w-max">
                                     <thead>
                                         <tr class="text-slate-400 border-b border-slate-100">
                                             <th class="pb-4 px-2 w-10"></th>
@@ -500,6 +522,10 @@
                                     <tbody class="divide-y divide-slate-50">
                     `;
                     table.columns.forEach(col => {
+                        const safeName = col.name.replace(/"/g, '&quot;');
+                        const safeDefault = col.default.replace(/"/g, '&quot;');
+                        const safeDesc = (col.description || '').replace(/"/g, '&quot;');
+
                         html += `
                             <tr class="group hover:bg-slate-50/50 transition-all duration-200"
                                 data-table-id="${table.id}"
@@ -517,9 +543,15 @@
                                     onmouseleave="this.parentElement.setAttribute('draggable', 'false')">
                                     <i data-lucide="grip-vertical" class="w-4 h-4 mx-auto cursor-grab active:cursor-grabbing text-slate-400 hover:text-brand-purple transition-colors"></i>
                                 </td>
-                                <td class="py-3 px-4"><input type="text" value="${col.name}" onchange="app.updateColumn('${table.id}', '${col.id}', 'name', this.value)" class="input-cell text-brand-blue"></td>
                                 <td class="py-3 px-4">
-                                    <select onchange="app.updateColumn('${table.id}', '${col.id}', 'type', this.value)" class="input-cell text-brand-green font-bold">
+                                    <div class="auto-expand-wrapper-schema min-w-[140px]" data-value="${safeName || '예: hp, name'}">
+                                        <input type="text" value="${safeName}" onchange="app.updateColumn('${table.id}', '${col.id}', 'name', this.value)" 
+                                               oninput="this.parentNode.setAttribute('data-value', this.value || this.placeholder)"
+                                               class="input-cell text-brand-blue w-full" style="grid-area: 1 / 1;" placeholder="예: hp, name">
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <select onchange="app.updateColumn('${table.id}', '${col.id}', 'type', this.value)" class="input-cell text-brand-green font-bold w-full min-w-[120px]">
                                         ${DATA_TYPES.map(t => `<option value="${t}" ${col.type === t ? 'selected' : ''}>${TYPE_LABELS[t]}</option>`).join('')}
                                     </select>
                                 </td>
@@ -527,8 +559,20 @@
                                 <td class="py-3 px-2 text-center"><input type="checkbox" ${col.fk ? 'checked' : ''} onchange="app.updateColumn('${table.id}', '${col.id}', 'fk', this.checked)" class="checkbox-custom mx-auto"></td>
                                 <td class="py-3 px-2 text-center"><input type="checkbox" ${col.nn ? 'checked' : ''} onchange="app.updateColumn('${table.id}', '${col.id}', 'nn', this.checked)" class="checkbox-custom mx-auto"></td>
                                 <td class="py-3 px-2 text-center"><input type="checkbox" ${col.uq ? 'checked' : ''} onchange="app.updateColumn('${table.id}', '${col.id}', 'uq', this.checked)" class="checkbox-custom mx-auto"></td>
-                                <td class="py-3 px-4"><input type="text" value="${col.default}" onchange="app.updateColumn('${table.id}', '${col.id}', 'default', this.value)" class="input-cell text-slate-400 italic" placeholder="NULL"></td>
-                                <td class="py-3 px-4"><input type="text" value="${col.description || ''}" onchange="app.updateColumn('${table.id}', '${col.id}', 'description', this.value)" class="input-cell text-slate-500 font-normal" placeholder="설명 입력..."></td>
+                                <td class="py-3 px-4">
+                                    <div class="auto-expand-wrapper-schema italic-after min-w-[120px]" data-value="${safeDefault || 'NULL'}">
+                                        <input type="text" value="${safeDefault}" onchange="app.updateColumn('${table.id}', '${col.id}', 'default', this.value)" 
+                                               oninput="this.parentNode.setAttribute('data-value', this.value || this.placeholder)"
+                                               class="input-cell text-slate-400 italic w-full" style="grid-area: 1 / 1;" placeholder="NULL">
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <div class="auto-expand-wrapper-schema font-normal-after min-w-[200px]" data-value="${safeDesc || '설명 입력...'}">
+                                        <input type="text" value="${safeDesc}" onchange="app.updateColumn('${table.id}', '${col.id}', 'description', this.value)" 
+                                               oninput="this.parentNode.setAttribute('data-value', this.value || this.placeholder)"
+                                               class="input-cell text-slate-500 font-normal w-full" style="grid-area: 1 / 1;" placeholder="설명 입력...">
+                                    </div>
+                                </td>
                                 <td class="py-3 px-2"><button onclick="app.deleteColumn('${table.id}', '${col.id}')" class="opacity-0 group-hover:opacity-100 p-2 text-slate-300 hover:text-red-500 transition-all"><i data-lucide="x" class="w-4 h-4"></i></button></td>
                             </tr>
                         `;
@@ -609,18 +653,18 @@
                             </div>
                         </div>
                         <div id="data-scroll-container" class="flex-1 overflow-auto p-4">
-                            <table class="w-full text-left border-separate border-spacing-0">
+                            <table class="w-full min-w-max text-left border-separate border-spacing-0">
                                 <thead class="sticky top-0 bg-white z-10 shadow-sm rounded-xl">
                                     <tr>
-                                        <th class="py-4 px-6 border-b border-slate-200 text-xs font-black text-slate-400 uppercase tracking-widest text-center w-16 bg-slate-50 rounded-tl-xl">#</th>
+                                        <th class="py-4 px-6 border-b border-slate-200 text-xs font-black text-slate-400 uppercase tracking-widest text-center w-16 bg-slate-50 rounded-tl-xl whitespace-nowrap">#</th>
                 `;
                 table.columns.forEach(col => {
                     html += `
-                        <th class="py-4 px-6 border-b border-slate-200 bg-slate-50">
+                        <th class="py-4 px-6 border-b border-slate-200 bg-slate-50 min-w-[160px] whitespace-nowrap">
                             <div class="flex flex-col gap-1">
                                 <span class="text-sm font-bold text-slate-800">${col.name}</span>
                                 <span class="text-[10px] text-slate-400 uppercase tracking-tighter font-black">${col.type} ${col.pk ? '· PK' : ''}</span>
-                                ${col.description ? `<span class="text-[11px] text-slate-500 font-medium mt-0.5 truncate max-w-[150px]" title="${col.description}">${col.description}</span>` : ''}
+                                ${col.description ? `<span class="text-[11px] text-slate-500 font-medium mt-0.5 truncate max-w-[200px]" title="${col.description}">${col.description}</span>` : ''}
                             </div>
                         </th>
                     `;
@@ -633,10 +677,16 @@
                     table.data.forEach((row, idx) => {
                         html += `<tr class="group hover:bg-slate-50 transition-colors"><td class="py-3 px-6 border-b border-slate-100 text-center font-bold text-slate-400 text-xs">${idx+1}</td>`;
                         table.columns.forEach(col => {
-                            html += `<td class="py-3 px-6 border-b border-slate-100">
-                                        <input type="text" value="${row[col.name] || ''}" onchange="app.updateData('${table.id}', ${idx}, '${col.name}', this.value)" 
-                                               class="w-full bg-slate-50 hover:bg-slate-100 font-medium text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-brand-blue/20 rounded-lg px-3 py-2 border border-transparent focus:border-brand-blue transition-all" 
-                                               placeholder="입력...">
+                            const valStr = row[col.name] !== undefined && row[col.name] !== null ? String(row[col.name]) : '';
+                            const safeValForData = valStr.replace(/"/g, '&quot;');
+                            html += `<td class="py-2.5 px-4 border-b border-slate-100">
+                                        <div class="auto-expand-wrapper min-w-[140px]" data-value="${safeValForData || '입력...'}">
+                                            <input type="text" value="${safeValForData}" onchange="app.updateData('${table.id}', ${idx}, '${col.name}', this.value)" 
+                                                   oninput="this.parentNode.setAttribute('data-value', this.value || this.placeholder)"
+                                                   class="w-full bg-slate-50 hover:bg-slate-100 font-medium text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-brand-blue/20 rounded-lg px-3 py-2 border border-transparent focus:border-brand-blue transition-all" 
+                                                   style="grid-area: 1 / 1;"
+                                                   placeholder="입력...">
+                                        </div>
                                      </td>`;
                         });
                         html += `<td class="py-3 px-6 border-b border-slate-100 text-center"><button onclick="app.deleteRow('${table.id}', ${idx})" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all p-1.5 rounded-lg bg-white shadow-sm border border-slate-200"><i data-lucide="x" class="w-4 h-4"></i></button></td></tr>`;
@@ -750,7 +800,7 @@
                 });
                 t.data.push(newRow);
                 this.renderWorkspace();
-                this.showToast('새로운 데이터 행이 추가되었습니다.');
+                this.showToast('새로운 데이터 행이 추가되었습니다. 빈칸을 클릭해 수정하세요.');
             },
 
             updateData(tid, idx, colName, val) {
