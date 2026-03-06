@@ -178,7 +178,7 @@
 
     <!-- 설명서 모달 -->
     <div id="manual-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] hidden flex items-center justify-center transition-opacity p-4">
-        <div class="bg-white rounded-3xl shadow-float w-full max-w-3xl flex flex-col overflow-hidden h-[85vh] border border-slate-200">
+        <div class="bg-white rounded-3xl shadow-float w-full max-w-4xl flex flex-col overflow-hidden h-[85vh] border border-slate-200">
             <!-- 모달 헤더 -->
             <div class="px-8 py-5 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
                 <div class="flex items-center gap-3">
@@ -257,16 +257,40 @@
                 </section>
 
                 <section>
-                    <h3 class="text-xl font-bold text-red-500 mb-4 flex items-center gap-2"><i data-lucide="alert-triangle" class="w-6 h-6"></i> 4. 진짜 진짜 중요한 저장하기! (필독)</h3>
-                    <div class="bg-red-50 border border-red-200 p-5 rounded-2xl">
+                    <h3 class="text-xl font-bold text-brand-green mb-4 flex items-center gap-2"><i data-lucide="save" class="w-6 h-6"></i> 4. 프로젝트 도구 (저장하고 불러오기)</h3>
+                    
+                    <div class="bg-red-50 border border-red-200 p-5 rounded-2xl mb-6">
                         <p class="font-bold text-red-600 mb-2">🚨 새로고침(F5)을 하거나 창을 끄면 만든 게 전부 날아가요!</p>
-                        <p class="text-sm text-red-800/80 leading-relaxed mb-4">이 에디터는 빠르고 가볍게 돌아가려고 내 컴퓨터(브라우저) 안에서만 임시로 작동해요. 그래서 작업을 멈추거나 끌 때는 <b>무조건 저장</b>을 해야 합니다!</p>
-                        
-                        <h4 class="font-bold text-slate-800 mt-4 mb-2 border-b border-red-200 pb-2">안전하게 저장하는 방법 (왼쪽 아래 도구 이용)</h4>
-                        <ul class="list-disc pl-5 space-y-2 text-sm text-slate-700">
-                            <li><b>JSON 저장 (가장 추천!):</b> 뼈대부터 넣은 데이터까지 완벽하게 통째로 하나의 파일로 저장해요. 나중에 <b>[JSON 열기]</b>로 이 파일을 올리면 1초 만에 지금 화면 그대로 복구됩니다!</li>
-                            <li><b>엑셀 저장:</b> 만든 모든 표를 우리가 아는 진짜 엑셀 파일(.xlsx)로 예쁘게 다운받아요. 표마다 아래 탭으로 나뉘어져서 친구들이랑 나눠보기 좋아요.</li>
-                        </ul>
+                        <p class="text-sm text-red-800/80 leading-relaxed">이 에디터는 내 컴퓨터(브라우저) 안에서만 임시로 작동해요. 그래서 작업을 멈추거나 끄기 전에는 왼쪽 아래의 <b>프로젝트 도구 버튼들</b>을 이용해 꼭 파일을 저장해야 합니다.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- JSON -->
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+                            <h4 class="font-bold text-brand-purple flex items-center gap-2 mb-3 border-b pb-2"><i data-lucide="file-json" class="w-5 h-5"></i> JSON (가장 추천!)</h4>
+                            <ul class="space-y-3 text-sm text-slate-600">
+                                <li><strong class="text-slate-800"><i data-lucide="download" class="w-4 h-4 inline text-slate-400"></i> JSON 저장:</strong> 표의 뼈대, 연결선, 데이터까지 모든 걸 통째로 하나의 <b>'게임 세이브 파일'</b>처럼 완벽하게 묶어서 내 컴퓨터에 저장해요.</li>
+                                <li><strong class="text-slate-800"><i data-lucide="folder-open" class="w-4 h-4 inline text-slate-400"></i> JSON 열기:</strong> 저장해둔 JSON 파일을 불러오면, 아까 작업하던 상태 그대로 1초 만에 똑같이 복구해줍니다.</li>
+                            </ul>
+                        </div>
+
+                        <!-- EXCEL -->
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+                            <h4 class="font-bold text-brand-blue flex items-center gap-2 mb-3 border-b pb-2"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i> 엑셀 (.xlsx)</h4>
+                            <ul class="space-y-3 text-sm text-slate-600">
+                                <li><strong class="text-slate-800"><i data-lucide="file-spreadsheet" class="w-4 h-4 inline text-slate-400"></i> 엑셀 저장:</strong> 만든 모든 표를 우리가 아는 <b>진짜 엑셀 파일</b> 하나로 쏙 다운받아요. 표마다 엑셀의 아래쪽 탭(시트)으로 나뉘어 들어가서 팀원들과 나눠보기 좋아요.</li>
+                                <li><strong class="text-slate-800"><i data-lucide="file-spreadsheet" class="w-4 h-4 inline text-slate-400"></i> 엑셀 열기:</strong> 가지고 있던 엑셀 파일을 올리면, 시트별로 알아서 표를 여러 개 챡챡 분리해서 만들어줍니다.</li>
+                            </ul>
+                        </div>
+
+                        <!-- CSV -->
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm md:col-span-2">
+                            <h4 class="font-bold text-brand-green flex items-center gap-2 mb-3 border-b pb-2"><i data-lucide="file-text" class="w-5 h-5"></i> CSV (가벼운 텍스트 데이터)</h4>
+                            <ul class="space-y-3 text-sm text-slate-600">
+                                <li><strong class="text-slate-800"><i data-lucide="file-down" class="w-4 h-4 inline text-slate-400"></i> CSV 내보내기:</strong> 엑셀의 탭 기능이 없는 가벼운 파일이에요. 여러 개의 표를 각각 따로따로 쪼개서 한 번에 <b>와르르 다운로드</b>합니다. 개발자(프로그래머)에게 데이터를 넘겨줄 때 제일 많이 써요.</li>
+                                <li><strong class="text-slate-800"><i data-lucide="file-up" class="w-4 h-4 inline text-slate-400"></i> CSV 열기:</strong> 가지고 있는 CSV 파일 1개를 올리면, 새로운 표가 하나 뿅! 하고 맨 아래에 추가돼요.</li>
+                            </ul>
+                        </div>
                     </div>
                 </section>
 
@@ -532,6 +556,44 @@
             renderViewA() {
                 let html = `<div class="max-w-5xl mx-auto space-y-10 pb-20">`;
                 
+                html += `
+                    <div class="bg-blue-50/50 border border-blue-100 rounded-3xl p-6 shadow-sm">
+                        <div class="flex items-center gap-2 text-brand-blue font-bold text-lg mb-4">
+                            <i data-lucide="help-circle" class="w-5 h-5"></i> 기획 초보자를 위한 데이터 용어 가이드
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="tag-pk px-2 py-0.5 rounded-md text-[10px] font-black">PK</span>
+                                    <span class="font-bold text-slate-700 text-sm">고유 식별자</span>
+                                </div>
+                                <p class="text-xs text-slate-500 leading-relaxed">데이터를 구분하는 고유 번호 (예: 유저 번호)<br/><span class="text-brand-purple font-medium">* 표마다 1개씩 꼭 필요!</span></p>
+                            </div>
+                            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="tag-fk px-2 py-0.5 rounded-md text-[10px] font-black">FK</span>
+                                    <span class="font-bold text-slate-700 text-sm">다른 표 참조</span>
+                                </div>
+                                <p class="text-xs text-slate-500 leading-relaxed">다른 표의 PK를 가져와서 연결할 때 사용</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md text-[10px] font-black">NN</span>
+                                    <span class="font-bold text-slate-700 text-sm">필수 입력</span>
+                                </div>
+                                <p class="text-xs text-slate-500 leading-relaxed">비워두면 안 되는 필수 데이터 (Not Null)</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md text-[10px] font-black">UQ</span>
+                                    <span class="font-bold text-slate-700 text-sm">중복 불가</span>
+                                </div>
+                                <p class="text-xs text-slate-500 leading-relaxed">다른 값과 똑같을 수 없음 (Unique)</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
                 state.tables.forEach(table => {
                     html += `
                         <div class="bg-white rounded-3xl shadow-soft border border-brand-border overflow-hidden transition-all hover:shadow-float">
