@@ -46,6 +46,9 @@
     <!-- Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- SheetJS for Excel (.xlsx) Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <style>
         body { background-color: #F1F5F9; color: #1E293B; overflow: hidden; font-family: 'Noto Sans KR', sans-serif; }
         
@@ -129,6 +132,7 @@
             <div class="p-5 border-t border-slate-100 bg-slate-50/50 space-y-4 shrink-0">
                 <input type="file" id="import-json-file" accept=".json" class="hidden" onchange="app.importJSON(event)">
                 <input type="file" id="import-csv-file" accept=".csv" class="hidden" onchange="app.importCSV(event)">
+                <input type="file" id="import-excel-file" accept=".xlsx, .xls" class="hidden" onchange="app.importExcel(event)">
                 
                 <div class="flex items-center justify-between px-1">
                     <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">프로젝트 도구</span>
@@ -145,7 +149,13 @@
                         <i data-lucide="file-up" class="w-4 h-4 text-slate-400 group-hover:text-brand-green"></i> CSV 열기
                     </button>
                     <button onclick="app.exportCSV()" class="flex flex-col items-center justify-center gap-1.5 bg-white border border-slate-200 hover:border-brand-green hover:text-brand-green p-3 rounded-2xl text-[11px] font-bold transition-all shadow-sm group">
-                        <i data-lucide="file-down" class="w-4 h-4 text-slate-400 group-hover:text-brand-green"></i> CSV 합치기
+                        <i data-lucide="file-down" class="w-4 h-4 text-slate-400 group-hover:text-brand-green"></i> CSV 내보내기
+                    </button>
+                    <button onclick="document.getElementById('import-excel-file').click()" class="flex flex-col items-center justify-center gap-1.5 bg-white border border-slate-200 hover:border-brand-blue hover:text-brand-blue p-3 rounded-2xl text-[11px] font-bold transition-all shadow-sm group" title="엑셀 파일의 시트들을 불러옵니다">
+                        <i data-lucide="file-spreadsheet" class="w-4 h-4 text-slate-400 group-hover:text-brand-blue"></i> 엑셀 열기
+                    </button>
+                    <button onclick="app.exportExcel()" class="flex flex-col items-center justify-center gap-1.5 bg-white border border-slate-200 hover:border-brand-blue hover:text-brand-blue p-3 rounded-2xl text-[11px] font-bold transition-all shadow-sm group" title="모든 테이블을 하나의 엑셀 파일(시트 구분)로 다운로드">
+                        <i data-lucide="file-spreadsheet" class="w-4 h-4 text-slate-400 group-hover:text-brand-blue"></i> 엑셀 저장
                     </button>
                 </div>
             </div>
@@ -212,7 +222,8 @@
                     <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="save" class="w-5 h-5 text-brand-green"></i> 4. 프로젝트 백업 및 내보내기</h3>
                     <ul class="list-disc pl-5 space-y-2 text-sm leading-relaxed">
                         <li><b>JSON 저장 / 열기</b>: 지금 작업 중인 전체 스키마와 데이터를 하나의 묶음 파일로 저장하거나 다시 불러옵니다.</li>
-                        <li><b>CSV 합치기 / 열기</b>: 모든 테이블의 데이터를 하나의 엑셀(CSV) 형식 파일로 묶어서 저장합니다.</li>
+                        <li><b>엑셀 저장 / 열기</b>: 생성된 모든 테이블을 하나의 엑셀 파일로 묶어서 저장하거나, 엑셀 파일 안에 있는 여러 시트(Sheet)를 한 번에 불러옵니다.</li>
+                        <li><b>CSV 내보내기 / 열기</b>: 각각의 테이블 데이터를 개별 엑셀(CSV) 파일로 와르르 다운로드하거나 불러옵니다.</li>
                     </ul>
                 </section>
 
@@ -1079,31 +1090,250 @@
             },
 
             exportCSV() {
-                if(state.tables.length === 0) return;
-                let csv = "\uFEFF";
-                state.tables.forEach(t => {
-                    csv += `"[Table: ${t.name}]"\n` + t.columns.map(c => c.name).join(",") + "\n";
-                    t.data.forEach(r => {
-                        csv += t.columns.map(c => {
-                            let v = r[c.name] || '';
-                            return (typeof v === 'string' && (v.includes(',') || v.includes('"'))) ? `"${v.replace(/"/g, '""')}"` : v;
-                        }).join(",") + "\n";
-                    });
-                    csv += "\n";
+                if(state.tables.length === 0) {
+                    this.showToast('내보낼 테이블이 없습니다.');
+                    return;
+                }
+                
+                this.showToast('개별 CSV 파일 다운로드를 시작합니다. (다중 다운로드 허용 필요)');
+
+                // 브라우저의 팝업 차단을 방지하기 위해 약간의 딜레이를 두고 개별 다운로드
+                state.tables.forEach((t, index) => {
+                    setTimeout(() => {
+                        let csv = "\uFEFF"; // 한글 깨짐 방지 BOM 추가
+                        
+                        // 헤더(컬럼명) 추가
+                        csv += t.columns.map(c => c.name).join(",") + "\n";
+                        
+                        // 데이터 행 추가
+                        t.data.forEach(r => {
+                            csv += t.columns.map(c => {
+                                let v = r[c.name] !== undefined && r[c.name] !== null ? String(r[c.name]) : '';
+                                // 값 내부에 쉼표나 따옴표, 줄바꿈이 있을 경우 이스케이프 처리
+                                if (v.includes(',') || v.includes('"') || v.includes('\n')) {
+                                    v = `"${v.replace(/"/g, '""')}"`;
+                                }
+                                return v;
+                            }).join(",") + "\n";
+                        });
+
+                        // 파일 다운로드 트리거
+                        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                        const link = document.createElement("a");
+                        const url = URL.createObjectURL(blob);
+                        link.setAttribute("href", url);
+                        link.setAttribute("download", `${t.name}.csv`);
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                    }, index * 300); // 0.3초(300ms) 간격
                 });
-                const link = document.createElement("a"); link.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURIComponent(csv));
-                link.setAttribute("download", "All_Tables_Data.csv"); document.body.appendChild(link); link.click(); link.remove();
-                this.showToast('통합 CSV 파일이 다운로드되었습니다.');
+            },
+
+            exportExcel() {
+                if(state.tables.length === 0) {
+                    this.showToast('내보낼 테이블이 없습니다.');
+                    return;
+                }
+                
+                try {
+                    // 새 엑셀 워크북(파일) 생성
+                    const wb = XLSX.utils.book_new();
+                    
+                    state.tables.forEach(t => {
+                        // 1. 헤더(컬럼명) 배열 생성
+                        const headers = t.columns.map(c => c.name);
+                        
+                        // 2. 데이터 배열 생성
+                        const data = t.data.map(r => {
+                            const row = [];
+                            t.columns.forEach(c => {
+                                row.push(r[c.name] !== undefined && r[c.name] !== null ? r[c.name] : '');
+                            });
+                            return row;
+                        });
+                        
+                        // 3. 헤더와 데이터를 합쳐 워크시트 생성
+                        const wsData = [headers, ...data];
+                        const ws = XLSX.utils.aoa_to_sheet(wsData);
+                        
+                        // 엑셀 시트 이름은 최대 31자까지만 허용됨
+                        let sheetName = t.name.substring(0, 31);
+                        if (!sheetName) sheetName = "Sheet";
+                        
+                        // 워크북에 시트 추가
+                        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+                    });
+                    
+                    // 파일 다운로드 실행
+                    XLSX.writeFile(wb, "Data_Tables.xlsx");
+                    this.showToast('엑셀(.xlsx) 파일이 다운로드되었습니다.');
+                } catch(e) {
+                    console.error(e);
+                    this.showToast('엑셀 저장 중 오류가 발생했습니다.');
+                }
+            },
+
+            importExcel(e) {
+                const file = e.target.files[0]; 
+                if(!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    try {
+                        const data = new Uint8Array(ev.target.result);
+                        const workbook = XLSX.read(data, {type: 'array'});
+                        let importedCount = 0;
+                        let firstTableId = null;
+
+                        // 엑셀 파일 내의 모든 시트 순회
+                        workbook.SheetNames.forEach(sheetName => {
+                            const sheet = workbook.Sheets[sheetName];
+                            // 시트의 데이터를 2차원 배열(행과 열)로 파싱
+                            const jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
+
+                            if (jsonData.length > 0) {
+                                const headers = jsonData[0];
+                                const newTableId = 't_' + Math.random().toString(36).substr(2, 9);
+                                if (!firstTableId) firstTableId = newTableId;
+
+                                // 첫 번째 행(헤더)을 기반으로 컬럼 스키마 구성
+                                const columns = headers.map((h, i) => ({
+                                    id: 'c_' + Math.random().toString(36).substr(2, 9),
+                                    name: h ? String(h).trim() : `Column_${i+1}`,
+                                    type: 'STRING', // 기본적으로 STRING 타입 지정
+                                    pk: i === 0,    // 첫 번째 컬럼을 임의의 PK로 설정
+                                    fk: false,
+                                    nn: false,
+                                    uq: false,
+                                    default: '',
+                                    description: ''
+                                }));
+
+                                const tableData = [];
+                                // 두 번째 행부터 실제 데이터 매핑
+                                for (let i = 1; i < jsonData.length; i++) {
+                                    const rowArr = jsonData[i];
+                                    if (!rowArr || rowArr.length === 0) continue;
+
+                                    const rowObj = {};
+                                    columns.forEach((col, idx) => {
+                                        rowObj[col.name] = rowArr[idx] !== undefined && rowArr[idx] !== null ? String(rowArr[idx]) : '';
+                                    });
+                                    tableData.push(rowObj);
+                                }
+
+                                // 생성된 테이블을 상태(State)에 추가
+                                state.tables.push({
+                                    id: newTableId,
+                                    name: sheetName, // 시트 이름을 테이블명으로 사용
+                                    position: { x: 100 + state.tables.length * 30, y: 100 + state.tables.length * 30 },
+                                    columns: columns,
+                                    data: tableData
+                                });
+                                importedCount++;
+                            }
+                        });
+
+                        if (importedCount > 0) {
+                            this.setActiveTab(firstTableId); // 첫 번째로 가져온 테이블을 활성화하여 보여줌
+                            this.showToast(`${importedCount}개의 시트(테이블)를 성공적으로 불러왔습니다.`);
+                        } else {
+                            this.showToast('가져올 데이터가 엑셀 파일에 없습니다.');
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        this.showToast('엑셀 파일을 파싱하는 중 오류가 발생했습니다.');
+                    }
+                };
+                // 엑셀은 바이너리 데이터이므로 ArrayBuffer 형식으로 읽음
+                reader.readAsArrayBuffer(file);
+                e.target.value = ''; // 동일한 파일 재업로드를 위해 input 초기화
             },
 
             importCSV(e) {
-                const file = e.target.files[0]; if(!file) return;
+                const file = e.target.files[0]; 
+                if(!file) return;
+                
                 const reader = new FileReader();
                 reader.onload = (ev) => {
-                    this.showToast('CSV 데이터를 임포트했습니다. (테이블 생성 완료)');
-                    this.setActiveTab('schema');
+                    try {
+                        const text = ev.target.result;
+                        // 빈 줄 제거
+                        const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+                        if (lines.length === 0) {
+                            this.showToast('빈 CSV 파일입니다.');
+                            return;
+                        }
+
+                        // 간단한 CSV 파서 (내부의 쉼표 및 쌍따옴표 처리 포함)
+                        const parseLine = (line) => {
+                            const row = [];
+                            let inQuotes = false;
+                            let val = '';
+                            for (let i = 0; i < line.length; i++) {
+                                const char = line[i];
+                                if (char === '"') inQuotes = !inQuotes;
+                                else if (char === ',' && !inQuotes) {
+                                    row.push(val.trim());
+                                    val = '';
+                                } else {
+                                    val += char;
+                                }
+                            }
+                            row.push(val.trim());
+                            // 앞뒤에 있는 쌍따옴표 제거 및 이중 따옴표 복원
+                            return row.map(v => v.replace(/^"|"$/g, '').replace(/""/g, '"'));
+                        };
+
+                        const headers = parseLine(lines[0]);
+                        const newTableId = 't_' + Math.random().toString(36).substr(2, 9);
+                        // 파일명에서 확장자를 제외한 이름을 기본 테이블 이름으로 사용
+                        const tableName = file.name.replace(/\.[^/.]+$/, "") || "Imported_Table";
+                        
+                        // 첫 번째 줄(헤더)을 바탕으로 컬럼 스키마 구성
+                        const columns = headers.map((h, i) => ({
+                            id: 'c_' + Math.random().toString(36).substr(2, 9),
+                            name: h || `Column_${i+1}`,
+                            type: 'STRING', // CSV에서 불러온 데이터는 기본적으로 STRING 취급
+                            pk: i === 0,    // 첫 번째 컬럼을 임의의 PK로 설정
+                            fk: false,
+                            nn: false,
+                            uq: false,
+                            default: '',
+                            description: ''
+                        }));
+
+                        // 나머지 줄의 데이터 파싱
+                        const data = [];
+                        for (let i = 1; i < lines.length; i++) {
+                            const values = parseLine(lines[i]);
+                            const rowData = {};
+                            columns.forEach((col, idx) => {
+                                rowData[col.name] = values[idx] || '';
+                            });
+                            data.push(rowData);
+                        }
+
+                        // 파싱 완료된 데이터를 기반으로 새 테이블 등록
+                        state.tables.push({
+                            id: newTableId,
+                            name: tableName,
+                            position: { x: 100 + state.tables.length * 30, y: 100 + state.tables.length * 30 },
+                            columns: columns,
+                            data: data
+                        });
+
+                        this.setActiveTab(newTableId);
+                        this.showToast(`'${tableName}' 데이터를 성공적으로 불러왔습니다.`);
+                    } catch (err) {
+                        console.error(err);
+                        this.showToast('CSV 파일을 파싱하는 중 오류가 발생했습니다.');
+                    }
                 };
-                reader.readAsText(file); e.target.value = '';
+                reader.readAsText(file, 'UTF-8');
+                e.target.value = ''; // 재업로드를 위한 input 값 초기화
             },
 
             exportSVG() {
