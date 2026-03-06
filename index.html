@@ -177,69 +177,105 @@
     </div>
 
     <!-- 설명서 모달 -->
-    <div id="manual-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] hidden flex items-center justify-center transition-opacity">
-        <div class="bg-white rounded-3xl shadow-float w-full max-w-2xl flex flex-col overflow-hidden h-[80vh] m-4 border border-slate-200">
-            <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
+    <div id="manual-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] hidden flex items-center justify-center transition-opacity p-4">
+        <div class="bg-white rounded-3xl shadow-float w-full max-w-3xl flex flex-col overflow-hidden h-[85vh] border border-slate-200">
+            <!-- 모달 헤더 -->
+            <div class="px-8 py-5 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="p-2.5 bg-blue-50 text-brand-blue rounded-xl"><i data-lucide="book-open" class="w-6 h-6"></i></div>
-                    <h2 class="font-bold text-2xl text-slate-800">에디터 설명서</h2>
+                    <h2 class="font-bold text-2xl text-slate-800">에디터 사용 설명서</h2>
                 </div>
                 <button onclick="app.closeManual()" class="text-slate-400 hover:text-slate-600 hover:bg-slate-50 p-2.5 rounded-xl transition-all"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
-            <div class="p-8 overflow-y-auto space-y-8 bg-slate-50 flex-1 text-slate-600">
+            
+            <!-- 모달 본문 -->
+            <div class="p-8 overflow-y-auto space-y-10 bg-slate-50 flex-1 text-slate-700">
                 
-                <section>
-                    <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="layout-list" class="w-5 h-5 text-brand-purple"></i> 1. 구조 설계서</h3>
-                    <ul class="list-disc pl-5 space-y-2 text-sm leading-relaxed">
-                        <li>좌측 메뉴에서 <b>'테이블 추가'</b>를 눌러 게임 시스템의 뼈대를 만듭니다.</li>
-                        <li><b>PK (고유키)</b>: 데이터를 구분하는 고유 번호입니다. (예: 몬스터 ID) 각 표마다 1개씩 체크하는 것이 좋습니다.</li>
-                        <li><b>FK (참조키)</b>: 다른 표의 PK를 빌려와서 연결할 때 사용합니다.</li>
-                        <li><b>UQ (중복불가)</b>: 닉네임이나 이메일처럼 데이터가 다른 행과 겹치면 안 되는 항목에 체크합니다.</li>
-                        <li>행 제일 왼쪽의 <b>점 6개(⋮⋮)</b> 아이콘을 꾹 누른 상태로 위아래로 끌면 순서를 바꿀 수 있습니다.</li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="network" class="w-5 h-5 text-brand-purple"></i> 2. 관계도 (ERD)</h3>
-                    <ul class="list-disc pl-5 space-y-2 text-sm leading-relaxed">
-                        <li>테이블 간의 연결 관계를 한눈에 파악할 수 있는 시각화 탭입니다.</li>
-                        <li>속성 이름(예: <code class="bg-white px-1.5 py-0.5 rounded border text-brand-purple font-mono">item_id</code>)과 <b>FK 체크</b> 여부를 기반으로 선이 자동 연결됩니다.</li>
-                        <li>우측 상단의 <b>[자동 정렬]</b> 아이콘을 누르면 겹치지 않게 스마트하게 재배치됩니다.</li>
-                        <li><b>[SVG 복사]</b> 버튼을 누르면 깔끔한 벡터 이미지가 복사되어 <b>Figma</b>에 바로 붙여넣을 수 있습니다.</li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="table" class="w-5 h-5 text-brand-blue"></i> 3. 데이터 관리</h3>
-                    <ul class="list-disc pl-5 space-y-2 text-sm leading-relaxed">
-                        <li>좌측 메뉴 하단에서 <b>개별 테이블 이름</b>을 클릭하면 실제 데이터를 넣을 수 있습니다.</li>
-                        <li><b>[데이터 추가]</b> 혹은 <b>[데이터 채우기]</b> 버튼으로 행을 생성하고, 입력칸에 데이터를 타이핑합니다.</li>
-                        <li><b>반응형 레이아웃</b>이 적용되어, 입력하는 내용의 길이에 맞게 칸이 부드럽게 늘어납니다!</li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="save" class="w-5 h-5 text-brand-green"></i> 4. 프로젝트 백업 및 내보내기</h3>
-                    <ul class="list-disc pl-5 space-y-2 text-sm leading-relaxed">
-                        <li><b>JSON 저장 / 열기</b>: 지금 작업 중인 전체 스키마와 데이터를 하나의 묶음 파일로 저장하거나 다시 불러옵니다.</li>
-                        <li><b>엑셀 저장 / 열기</b>: 생성된 모든 테이블을 하나의 엑셀 파일로 묶어서 저장하거나, 엑셀 파일 안에 있는 여러 시트(Sheet)를 한 번에 불러옵니다.</li>
-                        <li><b>CSV 내보내기 / 열기</b>: 각각의 테이블 데이터를 개별 엑셀(CSV) 파일로 와르르 다운로드하거나 불러옵니다.</li>
-                    </ul>
-                </section>
-
-                <div class="bg-blue-100/50 p-5 rounded-2xl border border-blue-200 mt-6">
-                    <p class="text-sm font-bold text-brand-blue mb-1">💡 꿀팁: 자동 저장 주의사항</p>
-                    <p class="text-xs text-brand-blue/80 leading-relaxed">이 도구의 데이터는 브라우저를 완전히 닫거나 새로고침하면 지워질 수 있습니다. 작업이 끝나면 꼭 좌측 하단의 <b>[JSON 저장]</b>을 눌러 내 컴퓨터에 안전하게 백업해주세요!</p>
+                <!-- 소개 -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <p class="text-base leading-relaxed">
+                        🎉 <b>환영합니다!</b> 이곳은 게임에 필요한 <b>데이터(캐릭터, 몬스터, 아이템 등)</b>를 엑셀보다 훨씬 쉽고 예쁘게 만들 수 있는 전용 에디터입니다. 아래의 간단한 설명을 읽고 시작해 보세요!
+                    </p>
                 </div>
+
+                <section>
+                    <h3 class="text-xl font-bold text-brand-purple mb-4 flex items-center gap-2"><i data-lucide="layout-list" class="w-6 h-6"></i> 1. 구조 설계서 (데이터의 뼈대 만들기)</h3>
+                    <p class="mb-3 text-sm leading-relaxed">가장 먼저 어떤 데이터를 모을지 <b>'표의 뼈대'</b>를 만듭니다. 예를 들어 '몬스터' 표를 만든다면 <code class="bg-purple-100 text-purple-700 px-1 rounded">이름</code>, <code class="bg-purple-100 text-purple-700 px-1 rounded">체력(HP)</code>, <code class="bg-purple-100 text-purple-700 px-1 rounded">공격력</code> 같은 칸이 필요하겠죠?</p>
+                    
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 space-y-4">
+                        <h4 class="font-bold text-slate-800 border-b pb-2">🤔 체크박스 용어, 쉽게 알아보기!</h4>
+                        <ul class="space-y-4 text-sm">
+                            <li class="flex gap-3">
+                                <span class="tag-pk px-2 py-1 rounded-md text-[11px] font-black h-fit shrink-0">PK</span>
+                                <div>
+                                    <strong class="text-slate-800">고유 식별자 (절대 안 겹치는 번호)</strong>
+                                    <p class="mt-1 leading-relaxed text-slate-600"><b>'주민등록번호'</b>나 <b>'학번'</b>처럼 캐릭터가 100만 명 있어도 다 다르게 가진 고유 번호예요. <br><span class="text-red-500 font-bold">※ 표마다 무조건 1개는 체크해 주세요!</span></p>
+                                </div>
+                            </li>
+                            <li class="flex gap-3">
+                                <span class="tag-fk px-2 py-1 rounded-md text-[11px] font-black h-fit shrink-0">FK</span>
+                                <div>
+                                    <strong class="text-slate-800">다른 표 연결 (꼬리표)</strong>
+                                    <p class="mt-1 leading-relaxed text-slate-600"><b>'이 아이템의 주인이 누구인지 다른 표에서 찾아볼 수 있게 연결해주는 꼬리표'</b>예요. 아이템 표에 '주인의 PK번호'를 적어둘 때 체크합니다.</p>
+                                </div>
+                            </li>
+                            <li class="flex gap-3">
+                                <span class="bg-slate-200 text-slate-600 px-2 py-1 rounded-md text-[11px] font-black h-fit shrink-0">NN</span>
+                                <div>
+                                    <strong class="text-slate-800">필수 입력 (빈칸 금지)</strong>
+                                    <p class="mt-1 leading-relaxed text-slate-600"><b>"절대 빈칸으로 두면 안 돼!"</b>라고 정하는 곳이에요. 캐릭터 이름이나 직업처럼 꼭 적어야 하는 것에 체크합니다.</p>
+                                </div>
+                            </li>
+                            <li class="flex gap-3">
+                                <span class="bg-slate-200 text-slate-600 px-2 py-1 rounded-md text-[11px] font-black h-fit shrink-0">UQ</span>
+                                <div>
+                                    <strong class="text-slate-800">중복 불가 (똑같은 거 안 됨)</strong>
+                                    <p class="mt-1 leading-relaxed text-slate-600">게임에서 <b>"이미 사용 중인 닉네임입니다."</b>라고 뜰 때처럼, 닉네임이나 이메일이 다른 사람과 똑같으면 안 될 때 체크합니다.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-xl font-bold text-brand-purple mb-4 flex items-center gap-2"><i data-lucide="network" class="w-6 h-6"></i> 2. 관계도 (ERD - 표들의 연결 그림 보기)</h3>
+                    <p class="text-sm leading-relaxed mb-3">여러분이 만든 표들이 서로 어떻게 짝지어 있는지 그림으로 예쁘게 보여주는 곳입니다.</p>
+                    <ul class="list-disc pl-5 space-y-2 text-sm leading-relaxed bg-white p-5 rounded-2xl border border-slate-200">
+                        <li><b>선이 예쁘게 연결되는 마법:</b> 한 표에 있는 PK 이름과 다른 표에서 <b>FK를 체크한 이름</b>이 똑같으면 둘 사이에 예쁜 화살표가 뿅! 하고 연결돼요.</li>
+                        <li><b>정리가 안 될 때:</b> 마우스로 표를 직접 움직일 수 있어요. 선이 너무 엉켜있다면 위쪽의 <b>[자동 정렬 <i data-lucide="layout-dashboard" class="w-4 h-4 inline text-slate-400"></i>]</b> 버튼을 누르면 기가 막히게 깔끔해집니다.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-xl font-bold text-brand-blue mb-4 flex items-center gap-2"><i data-lucide="table" class="w-6 h-6"></i> 3. 데이터 관리 (진짜 내용 채워넣기)</h3>
+                    <p class="text-sm leading-relaxed mb-3">설계 탭에서 뼈대를 만들었다면, 이제 진짜 데이터를 넣을 차례입니다. 왼쪽 메뉴 아래에서 만든 표(예: Characters)를 클릭해 보세요!</p>
+                    <ul class="list-disc pl-5 space-y-2 text-sm leading-relaxed bg-white p-5 rounded-2xl border border-slate-200">
+                        <li>엑셀처럼 빈칸을 클릭해서 키보드로 치면 돼요. 글을 길게 쓰면 칸이 자동으로 늘어나서 보기 편해요!</li>
+                        <li><b>[데이터 추가]</b> 버튼을 누르면 새로운 빈 줄이 생겨요.</li>
+                        <li>치기 귀찮을 땐? 위쪽의 <b>[데이터 채우기 <i data-lucide="zap" class="w-4 h-4 inline text-brand-green"></i>]</b> 버튼을 누르면 가짜 영웅, 몬스터, 레벨이 자동으로 5개씩 채워져서 테스트하기 좋아요!</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-xl font-bold text-red-500 mb-4 flex items-center gap-2"><i data-lucide="alert-triangle" class="w-6 h-6"></i> 4. 진짜 진짜 중요한 저장하기! (필독)</h3>
+                    <div class="bg-red-50 border border-red-200 p-5 rounded-2xl">
+                        <p class="font-bold text-red-600 mb-2">🚨 새로고침(F5)을 하거나 창을 끄면 만든 게 전부 날아가요!</p>
+                        <p class="text-sm text-red-800/80 leading-relaxed mb-4">이 에디터는 빠르고 가볍게 돌아가려고 내 컴퓨터(브라우저) 안에서만 임시로 작동해요. 그래서 작업을 멈추거나 끌 때는 <b>무조건 저장</b>을 해야 합니다!</p>
+                        
+                        <h4 class="font-bold text-slate-800 mt-4 mb-2 border-b border-red-200 pb-2">안전하게 저장하는 방법 (왼쪽 아래 도구 이용)</h4>
+                        <ul class="list-disc pl-5 space-y-2 text-sm text-slate-700">
+                            <li><b>JSON 저장 (가장 추천!):</b> 뼈대부터 넣은 데이터까지 완벽하게 통째로 하나의 파일로 저장해요. 나중에 <b>[JSON 열기]</b>로 이 파일을 올리면 1초 만에 지금 화면 그대로 복구됩니다!</li>
+                            <li><b>엑셀 저장:</b> 만든 모든 표를 우리가 아는 진짜 엑셀 파일(.xlsx)로 예쁘게 다운받아요. 표마다 아래 탭으로 나뉘어져서 친구들이랑 나눠보기 좋아요.</li>
+                        </ul>
+                    </div>
+                </section>
+
             </div>
         </div>
     </div>
 
     <!-- 토스트 알림 -->
-    <div id="toast" class="fixed bottom-8 right-8 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-float transition-all duration-300 opacity-0 pointer-events-none z-50 flex items-center gap-3 font-semibold text-sm translate-y-4">
-        <div class="bg-emerald-500 p-1 rounded-full"><i data-lucide="check" class="w-4 h-4 text-white"></i></div>
-        <span id="toast-msg"></span>
-    </div>
+    <div id="toast-container"></div>
 
     <script>
         // --- State Management ---
@@ -309,6 +345,7 @@
         // --- Application Logic ---
         const app = {
             dragState: { srcColId: null, tableId: null },
+            toastTimer: null, // 타이머 관리를 위한 속성
 
             init() {
                 this.renderTabs();
@@ -316,14 +353,47 @@
                 this.setupERDEvents();
             },
 
+            // 렌더링 오류 방지를 위해 동적으로 DOM 요소를 체크 및 복구하는 강력한 로직 탑재
             showToast(msg) {
-                const toast = document.getElementById('toast');
-                document.getElementById('toast-msg').innerText = msg;
+                let toast = document.getElementById('toast');
+                let toastMsg = document.getElementById('toast-msg');
+
+                // 요소가 존재하지 않거나 유실되었을 경우 동적으로 복구 (Cannot set properties of null 오류 원천 차단)
+                if (!toast || !toastMsg) {
+                    const container = document.getElementById('toast-container') || document.body;
+                    
+                    toast = document.createElement('div');
+                    toast.id = 'toast';
+                    toast.className = 'fixed bottom-8 right-8 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-float transition-all duration-300 opacity-0 pointer-events-none z-50 flex items-center gap-3 font-semibold text-sm translate-y-4';
+                    
+                    const iconDiv = document.createElement('div');
+                    iconDiv.className = 'bg-emerald-500 p-1 rounded-full';
+                    iconDiv.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-white"></i>';
+                    
+                    toastMsg = document.createElement('span');
+                    toastMsg.id = 'toast-msg';
+                    
+                    toast.appendChild(iconDiv);
+                    toast.appendChild(toastMsg);
+                    container.appendChild(toast);
+                    
+                    if (window.lucide) {
+                        lucide.createIcons({ root: toast });
+                    }
+                }
+
+                toastMsg.innerText = msg;
                 toast.classList.remove('opacity-0', 'translate-y-4');
                 toast.classList.add('opacity-100', 'translate-y-0');
-                setTimeout(() => {
-                    toast.classList.add('opacity-0', 'translate-y-4');
-                    toast.classList.remove('opacity-100', 'translate-y-0');
+                
+                // 기존 타이머가 있다면 초기화 (여러번 광클 방지)
+                if (this.toastTimer) clearTimeout(this.toastTimer);
+                
+                this.toastTimer = setTimeout(() => {
+                    if (toast) {
+                        toast.classList.add('opacity-0', 'translate-y-4');
+                        toast.classList.remove('opacity-100', 'translate-y-0');
+                    }
                 }, 3000);
             },
 
@@ -410,10 +480,6 @@
                 header.innerHTML = `
                     <div class="flex items-center gap-6">
                         ${headerTitle}
-                        <div class="h-8 w-px bg-slate-200"></div>
-                        <div class="flex items-center gap-2 text-[11px] text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full font-bold border border-emerald-100 tracking-wide uppercase">
-                            <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div> Auto Saved
-                        </div>
                     </div>
                     <div class="flex items-center gap-3">
                         ${headerActions}
@@ -466,44 +532,6 @@
             renderViewA() {
                 let html = `<div class="max-w-5xl mx-auto space-y-10 pb-20">`;
                 
-                html += `
-                    <div class="bg-blue-50/50 border border-blue-100 rounded-3xl p-6 shadow-sm">
-                        <div class="flex items-center gap-2 text-brand-blue font-bold text-lg mb-4">
-                            <i data-lucide="help-circle" class="w-5 h-5"></i> 기획 초보자를 위한 데이터 용어 가이드
-                        </div>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <span class="tag-pk px-2 py-0.5 rounded-md text-[10px] font-black">PK</span>
-                                    <span class="font-bold text-slate-700 text-sm">고유 식별자</span>
-                                </div>
-                                <p class="text-xs text-slate-500 leading-relaxed">데이터를 구분하는 고유 번호 (예: 유저 번호)<br/><span class="text-brand-purple font-medium">* 표마다 1개씩 꼭 필요!</span></p>
-                            </div>
-                            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <span class="tag-fk px-2 py-0.5 rounded-md text-[10px] font-black">FK</span>
-                                    <span class="font-bold text-slate-700 text-sm">다른 표 참조</span>
-                                </div>
-                                <p class="text-xs text-slate-500 leading-relaxed">다른 표의 PK를 가져와서 연결할 때 사용</p>
-                            </div>
-                            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md text-[10px] font-black">NN</span>
-                                    <span class="font-bold text-slate-700 text-sm">필수 입력</span>
-                                </div>
-                                <p class="text-xs text-slate-500 leading-relaxed">비워두면 안 되는 필수 데이터 (Not Null)</p>
-                            </div>
-                            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md text-[10px] font-black">UQ</span>
-                                    <span class="font-bold text-slate-700 text-sm">중복 불가</span>
-                                </div>
-                                <p class="text-xs text-slate-500 leading-relaxed">다른 값과 똑같을 수 없음 (Unique)</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
                 state.tables.forEach(table => {
                     html += `
                         <div class="bg-white rounded-3xl shadow-soft border border-brand-border overflow-hidden transition-all hover:shadow-float">
@@ -515,7 +543,6 @@
                                 <button onclick="app.deleteTable('${table.id}')" class="text-slate-300 hover:text-red-500 hover:bg-red-50 p-3 rounded-2xl transition-all"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
                             </div>
                             <div class="p-6 overflow-x-auto">
-                                <!-- min-w-max 속성을 제거하여 불필요한 늘어남을 방지하고 유연하게 크기를 조절하도록 수정했습니다. -->
                                 <table class="w-full text-left">
                                     <thead>
                                         <tr class="text-slate-400 border-b border-slate-100">
@@ -665,7 +692,6 @@
                             </div>
                         </div>
                         <div id="data-scroll-container" class="flex-1 overflow-auto p-4">
-                            <!-- min-w-max 속성을 제거하여 불필요한 늘어남을 방지하고 유연하게 크기를 조절하도록 수정했습니다. -->
                             <table class="w-full text-left border-separate border-spacing-0">
                                 <thead class="sticky top-0 bg-white z-10 shadow-sm rounded-xl">
                                     <tr>
